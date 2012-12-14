@@ -66,12 +66,13 @@ void draw() {
   for( TMesh lightMesh : lightBalls )
   {
     currPos = lightMesh.getPosition();
-    //drawRefs( currPos );
+    drawRefs( currPos );                // turn this off to get rid of the XYZ guides
     stroke( 255 );
     lightMesh.draw();
     pointLight( 255, 255, 255, currPos.x, currPos.y, currPos.z );
     
     fill( 0, 0, 50 );
+    noFill();                          // turn this off to see the grid of cubes
     noStroke();
     for ( Cube c : allCubes )
     {
@@ -80,7 +81,7 @@ void draw() {
       {
         int checkEdges = checkEdge( currPos );
       
-        int ranNum = floor( random( 0, 6 ) );
+        int ranNum = floor( random( 0, values.size() ) );
         Value thisValue = (Value) values.get( ranNum );
         lightMesh.direction = (int) thisValue.num;
         resetValues();
@@ -124,7 +125,7 @@ void updatePosition( TMesh _lightMesh, PVector _currPos, int _dir ) // 0=down, 1
 int checkEdge( PVector currPos ) // 0=down, 1=up, 2=left, 3=right, 4=front, 5=back
 {
 
-  if ( zeroMargin( currPos.x ) && zeroMargin( currPos.y ) && zeroMargin( currPos.z ) )      // at a TOP CORNER edge (A)
+  if ( zeroMargin( currPos.x ) && zeroMargin( currPos.y ) && zeroMargin( currPos.z ) )      // at a TOP CORNER edge (A), rotating clockwise.
   { 
     println( "CORNER A" );
     int[] badValues = {1, 2, 5};
@@ -156,7 +157,7 @@ int checkEdge( PVector currPos ) // 0=down, 1=up, 2=left, 3=right, 4=front, 5=ba
     return 1;
   }  
 
-  if ( zeroMargin( currPos.x ) && limitMargin( currPos.y ) && zeroMargin( currPos.z ) ) // at a BOTTOM CORNER edge
+  if ( zeroMargin( currPos.x ) && limitMargin( currPos.y ) && zeroMargin( currPos.z ) )
   { 
     println( "CORNER E" );
     int[] badValues = {0, 2, 5};
@@ -188,7 +189,7 @@ int checkEdge( PVector currPos ) // 0=down, 1=up, 2=left, 3=right, 4=front, 5=ba
     return 1;
   }  
 
-  if ( zeroMargin( currPos.y ) && zeroMargin( currPos.x ) )                     // at an edge in 2 directions @ TOP
+  if ( zeroMargin( currPos.y ) && zeroMargin( currPos.x ) )            // at an edge in 2 directions @ TOP
   { 
     println( "EDGE 1" );
     int[] badValues = {1, 2};
@@ -220,7 +221,7 @@ int checkEdge( PVector currPos ) // 0=down, 1=up, 2=left, 3=right, 4=front, 5=ba
     return 1;
   }  
 
-  if ( limitMargin( currPos.y ) && zeroMargin( currPos.x ) )   // at an edge in 2 directions @ BOTTOM
+  if ( limitMargin( currPos.y ) && zeroMargin( currPos.x ) )       // at an edge in 2 directions @ BOTTOM
   { 
     println( "EDGE 5" );
     int[] badValues = {0, 2};
@@ -252,7 +253,7 @@ int checkEdge( PVector currPos ) // 0=down, 1=up, 2=left, 3=right, 4=front, 5=ba
     return 1;
   }  
 
-  if ( zeroMargin( currPos.x ) && zeroMargin( currPos.z ) )                     // at an edge in 2 directions on VERTICAL
+  if ( zeroMargin( currPos.x ) && zeroMargin( currPos.z ) )         // at an edge in 2 directions on VERTICAL
   { 
     println( "EDGE 9" );
     int[] badValues = {2, 5};
@@ -337,7 +338,7 @@ int checkEdge( PVector currPos ) // 0=down, 1=up, 2=left, 3=right, 4=front, 5=ba
 
 boolean zeroMargin( float f )
 {
-  if ( f < 0.5 )
+  if ( abs( 0 - f ) < 0.5 )
   {
     return true;
   } 
@@ -348,7 +349,7 @@ boolean zeroMargin( float f )
 
 boolean limitMargin( float f )
 {
-  if ( (cubeSize * gridSize) - f  < 0.5 )
+  if ( abs( ((cubeSize * gridSize) + cubeSize/2 ) - f )  < 0.5 )
   {
     return true;
   } 
@@ -366,7 +367,7 @@ void removeValues( int[] badValues )
     {
       Value thisValue = values.get( j );
       if ( thisValue.num == badValues[i] ) {
-        thisValue.num = 6; // will do nothing since
+        values.remove( thisValue );
       }
     }
   }
